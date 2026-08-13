@@ -87,13 +87,18 @@
       // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
       // expected to change.
 
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile device style: fill the whole browser client area with the game canvas:
+      // 27 East: the game fills the whole browser client area on EVERY device.
+      // The stock template only did this on mobile and pinned desktop to a
+      // fixed 960x600 window with a footer underneath.
+      // The viewport meta is now added unconditionally so the page never
+      // scrolls or zooms; the canvas is sized by CSS (100% / 100%) rather than
+      // in pixels, which also makes it follow window resizes for free.
+      var meta = document.createElement('meta');
+      meta.name = 'viewport';
+      meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+      document.getElementsByTagName('head')[0].appendChild(meta);
 
-        var meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-        document.getElementsByTagName('head')[0].appendChild(meta);
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         document.querySelector("#unity-container").className = "unity-mobile";
         canvas.className = "unity-mobile";
 
@@ -102,11 +107,10 @@
         // config.devicePixelRatio = 1;
 
 
-      } else {
-        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
-        canvas.style.width = "960px";
-        canvas.style.height = "600px";
       }
+      // No desktop branch: CSS already sizes the canvas to 100% of the
+      // viewport. Setting explicit pixel sizes here is what pinned the game to
+      // a small centred window.
 
       document.querySelector("#unity-loading-bar").style.display = "block";
 
